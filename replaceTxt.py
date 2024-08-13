@@ -1,21 +1,29 @@
 import os
 
-def replace_language_code_in_filenames():
-    current_directory = os.getcwd() 
-    for filename in os.listdir(current_directory):
-        if "to_replace" in filename:
-            new_filename = filename.replace("to_replace", "whatever_you_want_to_put")
-            os.rename(filename, new_filename)
-            print(f"The filename has been successfully changed: {filename} -> {new_filename}")
-        else:
-            print(f"The file {filename} does not contain 'to_replace' in its name.")
+def replace_language_code_in_filenames(directory, target, replacement, include_subdirs=False):
+    for root, dirs, files in os.walk(directory):
+        for filename in files:
+            if target in filename:
+                new_filename = filename.replace(target, replacement)
+                os.rename(os.path.join(root, filename), os.path.join(root, new_filename))
+                print(f"The file name has been successfully modified: {filename} -> {new_filename}")
+            else:
+                print(f"The {filename} file does not contain '{target}' in its name.")
+        
+        if not include_subdirs:
+            break 
 
 def main():
-    confirm = input("Do you want to replace 'to_replace' with 'fr' in the filenames of this folder? (Yes/No): ")
-    if confirm.lower() == "yes":
-        replace_language_code_in_filenames()
-    elif confirm.lower() == "no":
-        print("The program has been stopped.")
+    target = input("What do you want to replace in the filenames? ")
+    replacement = input(f"What do you want to replace '{target}' with? ")
+    include_subdirs = input("Do you want to do this with the subfolders? (Yes/No): ")
+
+    current_directory = os.getcwd()
+
+    if include_subdirs.lower() == "yes":
+        replace_language_code_in_filenames(current_directory, target, replacement, include_subdirs=True)
+    elif include_subdirs.lower() == "no":
+        replace_language_code_in_filenames(current_directory, target, replacement, include_subdirs=False)
     else:
         print("Please respond with 'Yes' or 'No'.")
 
